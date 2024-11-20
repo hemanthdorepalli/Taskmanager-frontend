@@ -19,10 +19,7 @@ $('#login-form').submit(function (e) {
     $.ajax({
         url: API_URL + 'login/',
         method: 'POST',
-        data: {
-            username,
-            password
-        },
+        data: { username, password },
         success: function (data) {
             accessToken = data.access_token; // Store access token from login response
             localStorage.setItem('accessToken', accessToken);
@@ -42,13 +39,9 @@ $('#register-form').submit(function (e) {
     const password = $('#reg-password').val();
 
     $.ajax({
-        url: API_URL + 'register/',
+        url: API_URL + 'register/',  // Ensure this URL is correct
         method: 'POST',
-        data: {
-            username,
-            email,
-            password
-        },
+        data: { username, email, password },
         success: function (data) {
             alert('Registration successful!');
             $('#register-form')[0].reset();
@@ -57,6 +50,7 @@ $('#register-form').submit(function (e) {
         },
         error: function (error) {
             alert('Error during registration');
+            console.error(error);
         }
     });
 });
@@ -93,9 +87,7 @@ function loadTasks() {
     $.ajax({
         url: API_URL + 'tasks/',
         method: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + accessToken
-        },
+        headers: { 'Authorization': 'Bearer ' + accessToken },
         success: function (data) {
             const tasks = data;
             const tasksTable = $('#tasks-table tbody');
@@ -119,6 +111,7 @@ function loadTasks() {
             $('#tasks-table').DataTable();
         },
         error: function (error) {
+            console.error('Failed to load tasks:', error);
             alert('Failed to load tasks');
         }
     });
@@ -129,9 +122,7 @@ function loadTaskStats() {
     $.ajax({
         url: API_URL + 'tasks/',
         method: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + accessToken
-        },
+        headers: { 'Authorization': 'Bearer ' + accessToken },
         success: function (data) {
             const totalTasks = data.length;
             const completedTasks = data.filter(task => task.status === 'completed').length;
@@ -142,6 +133,7 @@ function loadTaskStats() {
             $('#pending-tasks').text(pendingTasks);
         },
         error: function (error) {
+            console.error('Failed to load task stats:', error);
             alert('Failed to load task stats');
         }
     });
@@ -152,9 +144,7 @@ function editTask(taskId) {
     $.ajax({
         url: API_URL + 'tasks/' + taskId + '/',
         method: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + accessToken
-        },
+        headers: { 'Authorization': 'Bearer ' + accessToken },
         success: function (data) {
             $('#task-id').val(data.id);
             $('#title').val(data.title);
@@ -179,13 +169,7 @@ $('#save-task').click(function () {
     const status = $('#status').val();
     const deadline = $('#deadline').val();
 
-    const data = {
-        title,
-        description,
-        priority,
-        status,
-        deadline
-    };
+    const data = { title, description, priority, status, deadline };
 
     let method = 'POST';
     let url = API_URL + 'tasks/';
@@ -198,9 +182,7 @@ $('#save-task').click(function () {
         url: url,
         method: method,
         data: data,
-        headers: {
-            'Authorization': 'Bearer ' + accessToken
-        },
+        headers: { 'Authorization': 'Bearer ' + accessToken },
         success: function () {
             $('#taskModal').modal('hide');
             loadTasks();
@@ -218,9 +200,7 @@ function deleteTask(taskId) {
         $.ajax({
             url: API_URL + 'tasks/' + taskId + '/',
             method: 'DELETE',
-            headers: {
-                'Authorization': 'Bearer ' + accessToken
-            },
+            headers: { 'Authorization': 'Bearer ' + accessToken },
             success: function () {
                 loadTasks();
                 loadTaskStats();
